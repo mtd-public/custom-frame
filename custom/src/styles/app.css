@@ -1,0 +1,175 @@
+/* Custom frame styles. Target: Android WebView 106: no nesting, no color-mix(), no
+   4/8-digit hex colours (use rgba), no dvh. Look and feel follows Wes's tokens.css. */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #0d0d0d; overflow: hidden; }
+body {
+  font-family: var(--sans); color: var(--ink);
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
+}
+button { font: inherit; color: inherit; }
+
+.viewport { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+.stage {
+  position: relative; flex: none; overflow: hidden;
+  background: var(--paper); transform-origin: center center;
+}
+
+/* ---------------------------------------------------------------- cards */
+.card {
+  background: var(--card); border-radius: var(--r);
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.04);
+  padding: 18px 22px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.card--clock, .card--weather, .card--family { background: transparent; box-shadow: none; padding: 6px 4px; }
+.card--photo { padding: 0; }
+.card--nextUp { padding: 0; }
+
+.w-label { font-size: var(--fs-label); font-weight: 800; letter-spacing: .1em; color: var(--mute); }
+.w-empty { margin: auto; color: var(--mute); font-size: var(--fs-m); }
+.w-more { margin-top: auto; font-weight: 800; color: var(--mute); }
+
+/* ---------------------------------------------------------------- edit mode */
+.stage.is-editing { background: var(--paper-2); }
+.stage.is-editing .card { box-shadow: 0 0 0 2px var(--line), 0 6px 18px rgba(17, 17, 17, 0.08); cursor: grab; }
+.stage.is-editing .card--clock,
+.stage.is-editing .card--weather,
+.stage.is-editing .card--family { background: rgba(251, 249, 244, 0.6); }
+.react-grid-item.react-draggable-dragging .card,
+.react-grid-item.react-draggable-dragging { cursor: grabbing; }
+.react-grid-item.react-draggable-dragging { box-shadow: 0 16px 40px rgba(17, 17, 17, 0.22); border-radius: var(--r); }
+.react-grid-item.react-grid-placeholder { background: var(--ink); opacity: .12; border-radius: var(--r); }
+
+/* Touch screens have no hover: make the resize corner big and always visible while editing. */
+.stage.is-editing .react-grid-item > .react-resizable-handle { opacity: 1; width: 44px; height: 44px; z-index: 2; }
+.stage.is-editing .react-grid-item > .react-resizable-handle::after {
+  right: 10px; bottom: 10px; width: 14px; height: 14px;
+  border-right: 4px solid var(--ink); border-bottom: 4px solid var(--ink); border-radius: 0 0 4px 0;
+}
+
+.card__remove {
+  position: absolute; top: 8px; right: 8px; z-index: 3;
+  width: 44px; height: 44px; border-radius: 50%; border: 0;
+  background: var(--ink); color: #fff; display: grid; place-items: center;
+}
+
+.gear {
+  position: absolute; right: 6px; bottom: 6px; z-index: 10;
+  width: 44px; height: 44px; border-radius: 50%; border: 0;
+  background: transparent; color: var(--mute); opacity: .35;
+  display: grid; place-items: center;
+}
+.gear:active { opacity: 1; background: var(--paper-2); }
+
+.editbar {
+  position: absolute; left: 50%; bottom: 20px; z-index: 20; transform: translateX(-50%);
+  display: flex; gap: 10px; align-items: center;
+  padding: 10px; border-radius: 999px; background: var(--ink); color: #fff;
+  box-shadow: 0 12px 40px rgba(17, 17, 17, 0.3);
+}
+.editbar.is-top { bottom: auto; top: 20px; }
+.palette.is-top { bottom: auto; top: 100px; }
+.editbar__hint { padding: 0 12px; font-size: var(--fs-label); opacity: .7; white-space: nowrap; }
+.editbar button, .palette button {
+  min-height: 56px; padding: 0 22px; border-radius: 999px; border: 0;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 800; font-size: 17px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+  background: rgba(255, 255, 255, 0.12); color: #fff;
+}
+.editbar button.is-primary { background: var(--warm); color: var(--ink); }
+
+.palette {
+  position: absolute; left: 50%; bottom: 100px; z-index: 20; transform: translateX(-50%);
+  display: grid; grid-template-columns: repeat(3, 200px); gap: 10px;
+  padding: 14px; border-radius: 28px; background: var(--ink);
+  box-shadow: 0 12px 40px rgba(17, 17, 17, 0.3);
+}
+.palette button { justify-content: space-between; border-radius: 18px; }
+.palette small { opacity: .6; font-weight: 600; }
+
+.flash {
+  position: absolute; left: 50%; top: 20px; z-index: 30; transform: translateX(-50%);
+  padding: 14px 24px; border-radius: 999px; background: var(--alert); color: #fff; font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- widgets */
+.w-clock { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; border-bottom: 3px solid var(--ink); padding-bottom: 8px; }
+.w-clock__time { font-weight: 900; font-stretch: 75%; line-height: .8; letter-spacing: -.03em; display: flex; align-items: flex-start; }
+.w-clock__ampm { font-size: 28px; letter-spacing: .04em; margin: 8px 0 0 12px; }
+.w-clock__date { margin-top: 14px; font-size: var(--fs-m); }
+.w-clock__date b { letter-spacing: .08em; margin-right: 6px; }
+.w-clock__date span { font-family: var(--serif); font-size: 28px; }
+
+.w-weather { height: 100%; display: flex; flex-direction: column; justify-content: space-between; border-bottom: 3px solid var(--ink); padding-bottom: 8px; }
+.w-weather__now { display: flex; align-items: center; gap: 16px; }
+.w-weather__temp { font-size: 84px; font-weight: 900; font-stretch: 75%; line-height: .9; }
+.w-weather__cond { display: flex; flex-direction: column; font-size: 18px; letter-spacing: .08em; }
+.w-weather__cond small { color: var(--mute); font-size: 18px; }
+.w-weather__hours { display: flex; justify-content: space-between; }
+.w-weather__hours div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.w-weather__hours small { color: var(--mute); font-weight: 800; font-size: var(--fs-min); }
+.w-weather__hours .is-wet .i { color: #2D5BFF; }
+
+.w-family { list-style: none; margin: 0; padding: 0 0 8px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; border-bottom: 3px solid var(--ink); }
+.w-family li { display: flex; align-items: center; gap: 12px; font-size: var(--fs-body); }
+.w-family li b { font-weight: 800; }
+.w-family li span:last-child { margin-left: auto; color: var(--mute); font-size: 16px; }
+.w-family li span.is-eta { color: var(--c); font-weight: 800; }
+.avatar-ring {
+  width: 36px; height: 36px; border-radius: 50%; flex: none;
+  display: inline-grid; place-items: center;
+  box-shadow: inset 0 0 0 3px var(--c); color: var(--c); font-weight: 900;
+}
+
+.w-next {
+  position: relative; height: 100%; padding: 26px 28px;
+  background: var(--c); color: var(--c-ink); border-radius: var(--r);
+  display: flex; flex-direction: column; align-items: flex-start;
+}
+.w-next small { font-weight: 800; letter-spacing: .1em; font-size: var(--fs-label); }
+.w-next h2 { font-family: var(--serif); font-weight: 400; font-size: var(--fs-hero); line-height: 1; margin: 8px 0 10px; max-width: 70%; }
+.w-next p { margin: 0 0 auto; font-size: var(--fs-body); }
+.w-next .pill {
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 999px;
+  background: var(--ink); color: #fff; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+.w-next__count { position: absolute; right: 28px; bottom: 22px; text-align: right; }
+.w-next__count b { display: block; font-size: 180px; font-weight: 900; font-stretch: 75%; line-height: .8; }
+.w-next__count small { font-size: 26px; }
+
+.w-agenda ul { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.w-agenda li {
+  display: flex; gap: 12px; align-items: baseline; padding: 8px 12px; border-radius: var(--r-s);
+  background: rgb(var(--c-rgb) / .14); box-shadow: inset 4px 0 0 var(--c);
+  white-space: nowrap; overflow: hidden;
+}
+.w-agenda li time { font-weight: 800; min-width: 78px; }
+.w-agenda li span { overflow: hidden; text-overflow: ellipsis; }
+.w-agenda__allday { margin-top: 8px; font-weight: 700; font-size: 16px; color: var(--ink-2); }
+
+.w-chores { display: flex; flex-direction: column; height: 100%; }
+.w-chores__rings { display: flex; justify-content: space-around; flex: 1; align-items: center; }
+.w-ring { position: relative; display: flex; flex-direction: column; align-items: center; }
+.w-ring b { position: absolute; left: 0; right: 0; top: 21px; text-align: center; font-size: 18px; }
+.w-ring small { margin-top: 4px; font-weight: 700; color: var(--ink-2); }
+.w-ring__bg { fill: none; stroke: rgb(var(--c-rgb) / .18); stroke-width: 4; }
+.w-ring__fg { fill: none; stroke: var(--c); stroke-width: 4; stroke-linecap: round; }
+
+.w-shop__count { margin-top: 6px; font-size: var(--fs-body); color: var(--mute); }
+.w-shop__count b { font-size: 64px; font-weight: 900; font-stretch: 75%; color: var(--ink); margin-right: 6px; }
+.w-shop ul { margin: 8px 0 0; padding-left: 20px; font-size: 18px; line-height: 1.5; }
+
+.w-photo {
+  height: 100%; border-radius: var(--r); background: #222 center / cover no-repeat;
+  display: flex; align-items: flex-end; padding: 20px 24px; color: #fff;
+  box-shadow: inset 0 -120px 80px -60px rgba(0, 0, 0, 0.6);
+}
+.w-photo span { font-family: var(--serif); font-size: 26px; }
+
+.w-note { flex: 1; font-family: var(--serif); font-size: 32px; line-height: 1.15; display: flex; align-items: center; }
+.w-note--edit {
+  width: 100%; border: 2px dashed var(--line); border-radius: var(--r-s); background: #fff;
+  padding: 10px; resize: none; color: var(--ink); user-select: text; -webkit-user-select: text;
+}

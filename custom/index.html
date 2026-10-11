@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1280, initial-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#F2EEE6">
+  <title>Custom Frame</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&display=swap">
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // Wall-display self-healing, as in Wes's dashboard: reload until the bundle starts.
+    setTimeout(function () { if (!window.__frameStarted) location.reload(); }, 10000);
+  </script>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
