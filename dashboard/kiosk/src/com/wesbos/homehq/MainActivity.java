@@ -2,6 +2,7 @@ package com.wesbos.homehq;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +22,7 @@ import android.webkit.WebViewClient;
  *   gets root, so the devtools socket should only exist while actively debugging):
  *     adb shell am start -n com.wesbos.homehq/.MainActivity --ez debug true
  * - Launch with a URL: adb shell am start -a android.intent.action.VIEW -d <url> -n com.wesbos.homehq/.MainActivity
+ *   The URL is remembered across reboots. Use -d default to return to DEFAULT_URL.
  */
 public class MainActivity extends Activity {
   static final String TAG = "HomeHQ";
@@ -64,16 +66,33 @@ public class MainActivity extends Activity {
     web.setWebViewClient(new WebViewClient()); // keep navigation inside the kiosk
     setContentView(web);
 
-    String url = getIntent().getDataString();
-    web.loadUrl(url != null ? url : DEFAULT_URL);
+    web.loadUrl(urlFor(getIntent()));
+  }
+
+  /**
+   * The URL to show: one passed with -d is saved and used on every later launch (including
+   * after a reboot), so pointing the kiosk at your own dashboard needs no rebuild.
+   * Pass -d default to go back to DEFAULT_URL.
+   */
+  private String urlFor(Intent intent) {
+    SharedPreferences prefs = getSharedPreferences("kiosk", MODE_PRIVATE);
+    String url = intent != null ? intent.getDataString() : null;
+    if ("default".equals(url)) {
+      prefs.edit().remove("url").apply();
+      return DEFAULT_URL;
+    }
+    if (url != null) {
+      prefs.edit().putString("url", url).apply();
+      return url;
+    }
+    return prefs.getString("url", DEFAULT_URL);
   }
 
   @Override
   protected void onNewIntent(Intent intent) {
     super.onNewIntent(intent);
     applyDebugFlag(intent);
-    String url = intent.getDataString();
-    if (url != null) web.loadUrl(url);
+    if (intent.getDataString() != null) web.loadUrl(urlFor(intent));
   }
 
   /** Remote debugging only when explicitly requested; any normal launch turns it back off. */
